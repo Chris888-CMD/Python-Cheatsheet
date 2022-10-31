@@ -77,8 +77,8 @@ Dictionary
 ```python
 value  = <dict>.get(key, default=None)          # Returns default if key is missing.
 value  = <dict>.setdefault(key, default=None)   # Returns and writes default if key is missing.
-<dict> = collections.defaultdict(<type>)        # Creates a dict with default value of type.
-<dict> = collections.defaultdict(lambda: 1)     # Creates a dict with default value 1.
+<dict> = collections.defaultdict(<type>)        # Returns a dict with default value of type.
+<dict> = collections.defaultdict(lambda: 1)     # Returns a dict with default value 1.
 ```
 
 ```python
@@ -109,7 +109,7 @@ Counter({'blue': 3, 'red': 2, 'yellow': 1})
 Set
 ---
 ```python
-<set> = set()
+<set> = set()                                   # `{}` returns a dictionary.
 ```
 
 ```python
@@ -144,7 +144,7 @@ Tuple
 -----
 **Tuple is an immutable and hashable list.**
 ```python
-<tuple> = ()
+<tuple> = ()                                # Empty tuple.
 <tuple> = (<el>,)                           # Or: <el>,
 <tuple> = (<el_1>, <el_2> [, ...])          # Or: <el_1>, <el_2> [, ...]
 ```
@@ -163,22 +163,21 @@ Point(x=1, y=2)
 1
 >>> getattr(p, 'y')
 2
->>> p._fields  # Or: Point._fields
-('x', 'y')
 ```
 
 
 Range
 -----
+**Immutable and hashable sequence of integers.**
 ```python
-<range> = range(to_exclusive)
-<range> = range(from_inclusive, to_exclusive)
-<range> = range(from_inclusive, to_exclusive, ±step_size)
+<range> = range(stop)                       # range(to_exclusive)
+<range> = range(start, stop)                # range(from_inclusive, to_exclusive)
+<range> = range(start, stop, ±step)         # range(from_inclusive, to_exclusive, ±step_size)
 ```
 
 ```python
-from_inclusive = <range>.start
-to_exclusive   = <range>.stop
+>>> [i for i in range(3)]
+[0, 1, 2]
 ```
 
 
@@ -201,23 +200,23 @@ Iterator
 
 ### Itertools
 ```python
-from itertools import count, repeat, cycle, chain, islice
+import itertools as it
 ```
 
 ```python
-<iter> = count(start=0, step=1)             # Returns updated value endlessly. Accepts floats.
-<iter> = repeat(<el> [, times])             # Returns element endlessly or 'times' times.
-<iter> = cycle(<collection>)                # Repeats the sequence endlessly.
+<iter> = it.count(start=0, step=1)          # Returns updated value endlessly. Accepts floats.
+<iter> = it.repeat(<el> [, times])          # Returns element endlessly or 'times' times.
+<iter> = it.cycle(<collection>)             # Repeats the sequence endlessly.
 ```
 
 ```python
-<iter> = chain(<coll_1>, <coll_2> [, ...])  # Empties collections in order (figuratively).
-<iter> = chain.from_iterable(<collection>)  # Empties collections inside a collection in order.
+<iter> = it.chain(<coll>, <coll> [, ...])   # Empties collections in order (figuratively).
+<iter> = it.chain.from_iterable(<coll>)     # Empties collections inside a collection in order.
 ```
 
 ```python
-<iter> = islice(<coll>, to_exclusive)       # Only returns first 'to_exclusive' elements.
-<iter> = islice(<coll>, from_inclusive, …)  # `to_exclusive, step_size`.
+<iter> = it.islice(<coll>, to_exclusive)    # Only returns first 'to_exclusive' elements.
+<iter> = it.islice(<coll>, from_inc, …)     # `to_exclusive, +step_size`. Indices can be None.
 ```
 
 
@@ -345,7 +344,7 @@ String
 | isdecimal()   |          |          |          |          |   yes    |
 +---------------+----------+----------+----------+----------+----------+
 ```
-* **Also: `'isspace()'` checks for `'[ \t\n\r\f\v\x1c-\x1f\x85…]'`.**
+* **Also: `'isspace()'` checks for `'[ \t\n\r\f\v\x1c-\x1f\x85\u2000…]'`.**
 
 
 Regex
@@ -392,14 +391,14 @@ import re
 Format
 ------
 ```python
-<str> = f'{<el_1>}, {<el_2>}'            # Or: '{}, {}'.format(<el_1>, <el_2>)
+<str> = f'{<el_1>}, {<el_2>}'            # Curly brackets can also contain expressions.
+<str> = '{}, {}'.format(<el_1>, <el_2>)  # Or: '{0}, {a}'.format(<el_1>, a=<el_2>)
 <str> = '%s, %s' % (<el_1>, <el_2>)      # Redundant and inferior C style formatting.
 ```
 
 ### Attributes
 ```python
->>> from collections import namedtuple
->>> Person = namedtuple('Person', 'name height')
+>>> Person = collections.namedtuple('Person', 'name height')
 >>> person = Person('Jean-Luc', 187)
 >>> f'{person.height}'
 '187'
@@ -487,11 +486,11 @@ Format
 Numbers
 -------
 ```python
-<int>      = int(<float/str/bool>)       # Or: math.floor(<float>)
-<float>    = float(<int/str/bool>)       # Or: <real>e±<int>
-<complex>  = complex(real=0, imag=0)     # Or: <real> ± <real>j
-<Fraction> = fractions.Fraction(0, 1)    # Or: Fraction(numerator=0, denominator=1)
-<Decimal>  = decimal.Decimal(<str/int>)  # Or: Decimal((sign, digits, exponent))
+<int>      = int(<float/str/bool>)                # Or: math.floor(<float>)
+<float>    = float(<int/str/bool>)                # Or: <real>e±<int>
+<complex>  = complex(real=0, imag=0)              # Or: <real> ± <real>j
+<Fraction> = fractions.Fraction(0, 1)             # Or: Fraction(numerator=0, denominator=1)
+<Decimal>  = decimal.Decimal(<str/int>)           # Or: Decimal((sign, digits, exponent))
 ```
 * **`'int(<str>)'` and `'float(<str>)'` raise ValueError on malformed strings.**
 * **Decimal numbers are stored exactly, unlike most floats where `'1.1 + 2.2 != 3.3'`.**
@@ -500,47 +499,46 @@ Numbers
 
 ### Basic Functions
 ```python
-<num> = pow(<num>, <num>)                # Or: <num> ** <num>
-<num> = abs(<num>)                       # <float> = abs(<complex>)
-<num> = round(<num> [, ±ndigits])        # `round(126, -1) == 130`
+<num> = pow(<num>, <num>)                         # Or: <num> ** <num>
+<num> = abs(<num>)                                # <float> = abs(<complex>)
+<num> = round(<num> [, ±ndigits])                 # `round(126, -1) == 130`
 ```
 
 ### Math
 ```python
-from math import e, pi, inf, nan, isinf, isnan
-from math import sin, cos, tan, asin, acos, atan, degrees, radians
-from math import log, log10, log2
+from math import e, pi, inf, nan, isinf, isnan    # `<el> == nan` is always False.
+from math import sin, cos, tan, asin, acos, atan  # Also: degrees, radians.
+from math import log, log10, log2                 # Log can accept base as second arg.
 ```
 
 ### Statistics
 ```python
-from statistics import mean, median, variance, stdev, quantiles, groupby
+from statistics import mean, median, variance     # Also: stdev, quantiles, groupby.
 ```
 
 ### Random
 ```python
-from random import random, randint, choice, shuffle, gauss, seed
-
-<float> = random()                       # A float inside [0, 1).
-<int>   = randint(from_inc, to_inc)      # An int inside [from_inc, to_inc].
-<el>    = choice(<sequence>)             # Keeps the sequence intact.
+from random import random, randint, choice        # Also shuffle, gauss, triangular, seed.
+<float> = random()                                # A float inside [0, 1).
+<int>   = randint(from_inc, to_inc)               # An int inside [from_inc, to_inc].
+<el>    = choice(<sequence>)                      # Keeps the sequence intact.
 ```
 
 ### Bin, Hex
 ```python
-<int> = ±0b<bin>                         # Or: ±0x<hex>
-<int> = int('±<bin>', 2)                 # Or: int('±<hex>', 16)
-<int> = int('±0b<bin>', 0)               # Or: int('±0x<hex>', 0)
-<str> = bin(<int>)                       # Returns '[-]0b<bin>'.
+<int> = ±0b<bin>                                  # Or: ±0x<hex>
+<int> = int('±<bin>', 2)                          # Or: int('±<hex>', 16)
+<int> = int('±0b<bin>', 0)                        # Or: int('±0x<hex>', 0)
+<str> = bin(<int>)                                # Returns '[-]0b<bin>'.
 ```
 
 ### Bitwise Operators
 ```python
-<int> = <int> & <int>                    # And (0b1100 & 0b1010 == 0b1000).
-<int> = <int> | <int>                    # Or  (0b1100 | 0b1010 == 0b1110).
-<int> = <int> ^ <int>                    # Xor (0b1100 ^ 0b1010 == 0b0110).
-<int> = <int> << n_bits                  # Left shift. Use >> for right.
-<int> = ~<int>                           # Not. Also -<int> - 1.
+<int> = <int> & <int>                             # And (0b1100 & 0b1010 == 0b1000).
+<int> = <int> | <int>                             # Or  (0b1100 | 0b1010 == 0b1110).
+<int> = <int> ^ <int>                             # Xor (0b1100 ^ 0b1010 == 0b0110).
+<int> = <int> << n_bits                           # Left shift. Use >> for right.
+<int> = ~<int>                                    # Not. Also -<int> - 1.
 ```
 
 
@@ -550,39 +548,40 @@ Combinatorics
 * **If you want to print the iterator, you need to pass it to the list() function first!**
 
 ```python
-from itertools import product, combinations, combinations_with_replacement, permutations
+import itertools as it
 ```
 
 ```python
->>> product([0, 1], repeat=3)
-[(0, 0, 0), (0, 0, 1), (0, 1, 0), (0, 1, 1), ..., (1, 1, 1)]
+>>> it.product([0, 1], repeat=3)
+[(0, 0, 0), (0, 0, 1), (0, 1, 0), (0, 1, 1),
+ (1, 0, 0), (1, 0, 1), (1, 1, 0), (1, 1, 1)]
 ```
 
 ```python
->>> product('abc', 'abc')                    #   a  b  c
-[('a', 'a'), ('a', 'b'), ('a', 'c'),         # a x  x  x
- ('b', 'a'), ('b', 'b'), ('b', 'c'),         # b x  x  x
- ('c', 'a'), ('c', 'b'), ('c', 'c')]         # c x  x  x
+>>> it.product('abc', 'abc')                      #   a  b  c
+[('a', 'a'), ('a', 'b'), ('a', 'c'),              # a x  x  x
+ ('b', 'a'), ('b', 'b'), ('b', 'c'),              # b x  x  x
+ ('c', 'a'), ('c', 'b'), ('c', 'c')]              # c x  x  x
 ```
 
 ```python
->>> combinations('abc', 2)                   #   a  b  c
-[('a', 'b'), ('a', 'c'),                     # a .  x  x
- ('b', 'c')]                                 # b .  .  x
+>>> it.combinations('abc', 2)                     #   a  b  c
+[('a', 'b'), ('a', 'c'),                          # a .  x  x
+ ('b', 'c')]                                      # b .  .  x
 ```
 
 ```python
->>> combinations_with_replacement('abc', 2)  #   a  b  c
-[('a', 'a'), ('a', 'b'), ('a', 'c'),         # a x  x  x
- ('b', 'b'), ('b', 'c'),                     # b .  x  x
- ('c', 'c')]                                 # c .  .  x
+>>> it.combinations_with_replacement('abc', 2)    #   a  b  c
+[('a', 'a'), ('a', 'b'), ('a', 'c'),              # a x  x  x
+ ('b', 'b'), ('b', 'c'),                          # b .  x  x
+ ('c', 'c')]                                      # c .  .  x
 ```
 
 ```python
->>> permutations('abc', 2)                   #   a  b  c
-[('a', 'b'), ('a', 'c'),                     # a .  x  x
- ('b', 'a'), ('b', 'c'),                     # b x  .  x
- ('c', 'a'), ('c', 'b')]                     # c x  x  .
+>>> it.permutations('abc', 2)                     #   a  b  c
+[('a', 'b'), ('a', 'c'),                          # a .  x  x
+ ('b', 'a'), ('b', 'c'),                          # b x  .  x
+ ('c', 'a'), ('c', 'b')]                          # c x  x  .
 ```
 
 
@@ -599,10 +598,10 @@ from dateutil.tz import UTC, tzlocal, gettz, datetime_exists, resolve_imaginary
 
 ### Constructors
 ```python
-<D>  = date(year, month, day)
-<T>  = time(hour=0, minute=0, second=0, microsecond=0, tzinfo=None, fold=0)
-<DT> = datetime(year, month, day, hour=0, minute=0, second=0, ...)
-<TD> = timedelta(weeks=0, days=0, hours=0, minutes=0, seconds=0, ...)
+<D>  = date(year, month, day)               # Only accepts valid dates from 1 to 9999 AD.
+<T>  = time(hour=0, minute=0, second=0)     # Also: `microsecond=0, tzinfo=None, fold=0`.
+<DT> = datetime(year, month, day, hour=0)   # Also: `minute=0, second=0, microsecond=0, …`.
+<TD> = timedelta(weeks=0, days=0, hours=0)  # Also: `minutes=0, seconds=0, microsecond=0`.
 ```
 * **Use `'<D/DT>.weekday()'` to get the day of the week as an int, with Monday being 0.**
 * **`'fold=1'` means the second pass in case of time jumping back for one hour.**
@@ -638,7 +637,7 @@ from dateutil.tz import UTC, tzlocal, gettz, datetime_exists, resolve_imaginary
 
 ### Decode
 ```python
-<str>    = <D/T/DT>.isoformat(sep='T')      # Also timespec='auto/hours/minutes/seconds/…'.
+<str>    = <D/T/DT>.isoformat(sep='T')      # Also: `timespec='auto/hours/minutes/seconds/…'`.
 <str>    = <D/T/DT>.strftime('<format>')    # Custom string representation.
 <int>    = <D/DT>.toordinal()               # Days since Gregorian NYE 1, ignoring time and tz.
 <float>  = <DTn>.timestamp()                # Seconds since the Epoch, from DTn in local tz.
@@ -668,9 +667,9 @@ Arguments
 ---------
 ### Inside Function Call
 ```python
-func(<positional_args>)                           # func(1, 2)
-func(<keyword_args>)                              # func(x=1, y=2)
-func(<positional_args>, <keyword_args>)           # func(1, y=2)
+func(<positional_args>)                           # func(0, 0)
+func(<keyword_args>)                              # func(x=0, y=0)
+func(<positional_args>, <keyword_args>)           # func(0, y=0)
 ```
 
 ### Inside Function Definition
@@ -680,7 +679,7 @@ def func(<default_args>): ...                     # def func(x=0, y=0): ...
 def func(<nondefault_args>, <default_args>): ...  # def func(x, y=0): ...
 ```
 * **Default values are evaluated when function is first encountered in the scope.**
-* **Any mutations of mutable default values will persist between invocations.**
+* **Any mutation of a mutable default value will persist between invocations.**
 
 
 Splat Operator
@@ -712,12 +711,6 @@ def add(*a):
 
 #### Legal argument combinations:
 ```python
-def f(*, x, y, z): ...          # f(x=1, y=2, z=3)
-def f(x, *, y, z): ...          # f(x=1, y=2, z=3) | f(1, y=2, z=3)
-def f(x, y, *, z): ...          # f(x=1, y=2, z=3) | f(1, y=2, z=3) | f(1, 2, z=3)
-```
-
-```python
 def f(*args): ...               # f(1, 2, 3)
 def f(x, *args): ...            # f(1, 2, 3)
 def f(*args, z): ...            # f(1, 2, z=3)
@@ -726,13 +719,18 @@ def f(*args, z): ...            # f(1, 2, z=3)
 ```python
 def f(**kwargs): ...            # f(x=1, y=2, z=3)
 def f(x, **kwargs): ...         # f(x=1, y=2, z=3) | f(1, y=2, z=3)
-def f(*, x, **kwargs): ...      # f(x=1, y=2, z=3)
 ```
 
 ```python
 def f(*args, **kwargs): ...     # f(x=1, y=2, z=3) | f(1, y=2, z=3) | f(1, 2, z=3) | f(1, 2, 3)
 def f(x, *args, **kwargs): ...  # f(x=1, y=2, z=3) | f(1, y=2, z=3) | f(1, 2, z=3) | f(1, 2, 3)
 def f(*args, y, **kwargs): ...  # f(x=1, y=2, z=3) | f(1, y=2, z=3)
+```
+
+```python
+def f(*, x, y, z): ...          # f(x=1, y=2, z=3)
+def f(x, *, y, z): ...          # f(x=1, y=2, z=3) | f(1, y=2, z=3)
+def f(x, y, *, z): ...          # f(x=1, y=2, z=3) | f(1, y=2, z=3) | f(1, 2, z=3)
 ```
 
 ### Other Uses
@@ -744,7 +742,7 @@ def f(*args, y, **kwargs): ...  # f(x=1, y=2, z=3) | f(1, y=2, z=3)
 ```
 
 ```python
-head, *body, tail = <coll.>     # Also `head, *body = <coll.>` and `*body, tail = <coll.>`.
+head, *body, tail = <coll.>     # Head or tail can be omitted.
 ```
 
 
@@ -752,16 +750,16 @@ Inline
 ------
 ### Lambda
 ```python
-<func> = lambda: <return_value>                           # A single statement function.
-<func> = lambda <arg_1>, <arg_2>: <return_value>          # Also accepts default arguments.
+<func> = lambda: <return_value>                     # A single statement function.
+<func> = lambda <arg_1>, <arg_2>: <return_value>    # Also accepts default arguments.
 ```
 
 ### Comprehensions
 ```python
-<list> = [i+1 for i in range(10)]                         # Or: [1, 2, ..., 10]
-<iter> = (i for i in range(10) if i > 5)                  # Or: iter([6, 7, 8, 9])
-<set>  = {i+5 for i in range(10)}                         # Or: {5, 6, ..., 14}
-<dict> = {i: i*2 for i in range(10)}                      # Or: {0: 0, 1: 2, ..., 9: 18}
+<list> = [i+1 for i in range(10)]                   # Or: [1, 2, ..., 10]
+<iter> = (i for i in range(10) if i > 5)            # Or: iter([6, 7, 8, 9])
+<set>  = {i+5 for i in range(10)}                   # Or: {5, 6, ..., 14}
+<dict> = {i: i*2 for i in range(10)}                # Or: {0: 0, 1: 2, ..., 9: 18}
 ```
 
 ```python
@@ -771,21 +769,21 @@ Inline
 
 ### Map, Filter, Reduce
 ```python
-<iter> = map(lambda x: x + 1, range(10))                  # Or: iter([1, 2, ..., 10])
-<iter> = filter(lambda x: x > 5, range(10))               # Or: iter([6, 7, 8, 9])
-<obj>  = reduce(lambda out, x: out + x, range(10))        # Or: 45
+<iter> = map(lambda x: x + 1, range(10))            # Or: iter([1, 2, ..., 10])
+<iter> = filter(lambda x: x > 5, range(10))         # Or: iter([6, 7, 8, 9])
+<obj>  = reduce(lambda out, x: out + x, range(10))  # Or: 45
 ```
 * **Reduce must be imported from the functools module.**
 
 ### Any, All
 ```python
-<bool> = any(<collection>)                                # Is `bool(el)` True for any element.
-<bool> = all(<collection>)                                # Is True for all elements or empty.
+<bool> = any(<collection>)                          # Is `bool(el)` True for any element.
+<bool> = all(<collection>)                          # Is True for all elements or empty.
 ```
 
 ### Conditional Expression
 ```python
-<obj> = <exp_if_true> if <condition> else <exp_if_false>
+<obj> = <exp> if <condition> else <exp>             # Only one expression gets evaluated.
 ```
 
 ```python
@@ -796,20 +794,20 @@ Inline
 ### Named Tuple, Enum, Dataclass
 ```python
 from collections import namedtuple
-Point = namedtuple('Point', 'x y')
-point = Point(0, 0)
+Point = namedtuple('Point', 'x y')                  # Creates a tuple's subclass.
+point = Point(0, 0)                                 # Returns its instance.
 ```
 
 ```python
 from enum import Enum
-Direction = Enum('Direction', 'n e s w')
-direction = Direction.n
+Direction = Enum('Direction', 'n e s w')            # Creates an enum.
+direction = Direction.n                             # Returns its member.
 ```
 
 ```python
 from dataclasses import make_dataclass
-Creature = make_dataclass('Creature', ['loc', 'dir'])
-creature = Creature(point, direction)
+Player = make_dataclass('Player', ['loc', 'dir'])   # Creates a class.
+player = Player(point, direction)                   # Returns its instance.
 ```
 
 
@@ -1243,7 +1241,7 @@ True
 ```
 
 ### Collection
-* **Only required methods are iter() and len().**
+* **Only required methods are iter() and len(). Len() should return the number of items.**
 * **This cheatsheet actually means `'<iterable>'` when it uses `'<collection>'`.**
 * **I chose not to use the name 'iterable' because it sounds scarier and more vague than 'collection'. The only drawback of this decision is that a reader could think a certain function doesn't accept iterators when it does, since iterators are the only built-in objects that are iterable but are not collections.**
 ```python
@@ -1280,7 +1278,7 @@ class MySequence:
 ```
 
 #### Discrepancies between glossary definitions and abstract base classes:
-* **Glossary defines iterable as any object with iter() or getitem() and sequence as any object with len() and getitem(). It does not define collection.**
+* **Glossary defines iterable as any object with iter() or getitem() and sequence as any object with getitem() and len(). It does not define collection.**
 * **Passing ABC Iterable to isinstance() or issubclass() checks whether object/class has method iter(), while ABC Collection checks for iter(), contains() and len().**
 
 ### ABC Sequence
@@ -1372,7 +1370,6 @@ LogicOp = Enum('LogicOp', {'AND': partial(lambda l, r: l and r),
 
 Exceptions
 ----------
-### Basic Example
 ```python
 try:
     <code>
@@ -1398,14 +1395,15 @@ finally:
 
 ### Catching Exceptions
 ```python
-except <exception>:
-except <exception> as <name>:
-except (<exception>, [...]):
-except (<exception>, [...]) as <name>:
+except <exception>: ...
+except <exception> as <name>: ...
+except (<exception>, [...]): ...
+except (<exception>, [...]) as <name>: ...
 ```
 * **Also catches subclasses of the exception.**
 * **Use `'traceback.print_exc()'` to print the error message to stderr.**
 * **Use `'print(<name>)'` to print just the cause of the exception (its arguments).**
+* **Use `'logging.exception(<message>)'` to log the exception.**
 
 ### Raising Exceptions
 ```python
@@ -1546,7 +1544,7 @@ value = args.<name>
 
 * **Use `'help=<str>'` to set argument description that will be displayed in help message.**
 * **Use `'default=<el>'` to set the default value.**
-* **Use `'type=FileType(<mode>)'` for files. Accepts 'encoding', but not 'newline'.**
+* **Use `'type=FileType(<mode>)'` for files. Accepts 'encoding', but 'newline' is None.**
 
 
 Open
@@ -1691,7 +1689,7 @@ from pathlib import Path
 
 ```python
 <str>  = str(<Path>)                # Returns path as a string.
-<file> = open(<Path>)               # Opens the file and returns a file object.
+<file> = open(<Path>)               # Also <Path>.read/write_text/bytes().
 ```
 
 
@@ -1702,34 +1700,34 @@ import os, shutil, subprocess
 ```
 
 ```python
-os.chdir(<path>)                 # Changes the current working directory.
-os.mkdir(<path>, mode=0o777)     # Creates a directory. Mode is in octal.
-os.makedirs(<path>, mode=0o777)  # Creates all path's dirs. Also: `exist_ok=False`.
+os.chdir(<path>)                    # Changes the current working directory.
+os.mkdir(<path>, mode=0o777)        # Creates a directory. Permissions are in octal.
+os.makedirs(<path>, mode=0o777)     # Creates all path's dirs. Also: `exist_ok=False`.
 ```
 
 ```python
-shutil.copy(from, to)            # Copies the file. 'to' can exist or be a dir.
-shutil.copytree(from, to)        # Copies the directory. 'to' must not exist.
+shutil.copy(from, to)               # Copies the file. 'to' can exist or be a dir.
+shutil.copytree(from, to)           # Copies the directory. 'to' must not exist.
 ```
 
 ```python
-os.rename(from, to)              # Renames/moves the file or directory.
-os.replace(from, to)             # Same, but overwrites 'to' if it exists.
+os.rename(from, to)                 # Renames/moves the file or directory.
+os.replace(from, to)                # Same, but overwrites 'to' if it exists.
 ```
 
 ```python
-os.remove(<path>)                # Deletes the file.
-os.rmdir(<path>)                 # Deletes the empty directory.
-shutil.rmtree(<path>)            # Deletes the directory.
+os.remove(<path>)                   # Deletes the file.
+os.rmdir(<path>)                    # Deletes the empty directory.
+shutil.rmtree(<path>)               # Deletes the directory.
 ```
 * **Paths can be either strings, Paths or DirEntry objects.**
 * **Functions report OS related errors by raising either OSError or one of its [subclasses](#exceptions-1).**
 
 ### Shell Commands
 ```python
-<pipe> = os.popen('<command>')   # Executes command in sh/cmd and returns its stdout pipe.
-<str>  = <pipe>.read(size=-1)    # Reads 'size' chars or until EOF. Also readline/s().
-<int>  = <pipe>.close()          # Closes the pipe. Returns None on success, int on error.
+<pipe> = os.popen('<command>')      # Executes command in sh/cmd. Returns its stdout pipe.
+<str>  = <pipe>.read(size=-1)       # Reads 'size' chars or until EOF. Also readline/s().
+<int>  = <pipe>.close()             # Closes the pipe. Returns None on success.
 ```
 
 #### Sends '1 + 1' to the basic calculator and captures its output:
@@ -1755,8 +1753,8 @@ JSON
 
 ```python
 import json
-<str>    = json.dumps(<object>, ensure_ascii=True, indent=None)
-<object> = json.loads(<str>)
+<str>    = json.dumps(<object>)     # Converts object to JSON string.
+<object> = json.loads(<str>)        # Converts JSON string to object.
 ```
 
 ### Read Object from JSON File
@@ -1780,8 +1778,8 @@ Pickle
 
 ```python
 import pickle
-<bytes>  = pickle.dumps(<object>)
-<object> = pickle.loads(<bytes>)
+<bytes>  = pickle.dumps(<object>)   # Converts object to bytes object.
+<object> = pickle.loads(<bytes>)    # Converts bytes object to object.
 ```
 
 ### Read Object from File
@@ -1814,7 +1812,7 @@ import csv
 <list>   = list(<reader>)           # Returns a list of remaining rows.
 ```
 * **File must be opened with a `'newline=""'` argument, or newlines embedded inside quoted fields will not be interpreted correctly!**
-* **To print the table to the console use [Tabulate](#table) library.**
+* **To print the spreadsheet to the console use [Tabulate](#table) library.**
 * **For XML and binary Excel files (xlsx, xlsm and xlsb) use [Pandas](#dataframe-plot-encode-decode) library.**
 
 ### Write
@@ -1830,7 +1828,7 @@ import csv
 * **`'delimiter'` - A one-character string used to separate fields.**
 * **`'quotechar'` - Character for quoting fields that contain special characters.**
 * **`'doublequote'` - Whether quotechars inside fields are/get doubled or escaped.**
-* **`'skipinitialspace'` - Whether whitespace after delimiter gets stripped by reader.**
+* **`'skipinitialspace'` - Is space character at the start of the field stripped by the reader.**
 * **`'lineterminator'` - How writer terminates rows. Reader is hardcoded to '\n', '\r', '\r\n'.**
 * **`'quoting'` - 0: As necessary, 1: All, 2: All but numbers which are read as floats, 3: None.**
 * **`'escapechar'` - Character for escaping quotechars if doublequote is False.**
@@ -1870,16 +1868,13 @@ SQLite
 ------
 **A server-less database engine that stores each database into a separate file.**
 
-### Connect
-**Opens a connection to the database file. Creates a new file if path doesn't exist.**
 ```python
 import sqlite3
-<conn> = sqlite3.connect(<path>)                # Also ':memory:'.
+<conn> = sqlite3.connect(<path>)                # Opens existing or new file. Also ':memory:'.
 <conn>.close()                                  # Closes the connection.
 ```
 
 ### Read
-**Returned values can be of type str, int, float, bytes or None.**
 ```python
 <cursor> = <conn>.execute('<query>')            # Can raise a subclass of sqlite3.Error.
 <tuple>  = <cursor>.fetchone()                  # Returns next row. Also next(<cursor>).
@@ -1900,13 +1895,13 @@ with <conn>:                                    # Exits the block with commit() 
 ```
 
 ### Placeholders
-* **Passed values can be of type str, int, float, bytes, None, bool, datetime.date or datetime.datetime.**
-* **Bools will be stored and returned as ints and dates as [ISO formatted strings](#encode).**
 ```python
 <conn>.execute('<query>', <list/tuple>)         # Replaces '?'s in query with values.
 <conn>.execute('<query>', <dict/namedtuple>)    # Replaces ':<key>'s with values.
 <conn>.executemany('<query>', <coll_of_above>)  # Runs execute() multiple times.
 ```
+* **Passed values can be of type str, int, float, bytes, None, bool, datetime.date or datetime.datetime.**
+* **Bools will be stored and returned as ints and dates as [ISO formatted strings](#encode).**
 
 ### Example
 **Values are not actually saved in this example because `'conn.commit()'` is omitted!**
@@ -1919,16 +1914,25 @@ with <conn>:                                    # Exits the block with commit() 
 [(1, 'Jean-Luc', 187)]
 ```
 
-### MySQL
-**Has a very similar interface, with differences listed below.**
+### SqlAlchemy
 ```python
-# $ pip3 install mysql-connector
-from mysql import connector
-<conn>   = connector.connect(host=<str>, …)     # `user=<str>, password=<str>, database=<str>`.
-<cursor> = <conn>.cursor()                      # Only cursor has execute() method.
-<cursor>.execute('<query>')                     # Can raise a subclass of connector.Error.
-<cursor>.execute('<query>', <list/tuple>)       # Replaces '%s's in query with values.
-<cursor>.execute('<query>', <dict/namedtuple>)  # Replaces '%(<key>)s's with values.
+# $ pip3 install sqlalchemy
+from sqlalchemy import create_engine, text
+<engine> = create_engine('<url>').connect()     # Url: 'dialect://user:password@host/dbname'.
+<conn>   = <engine>.connect()                   # Creates a connection. Also <conn>.close().
+<cursor> = <conn>.execute(text('<query>'), …)   # Replaces ':<key>'s with keyword arguments.
+with <conn>.begin(): ...                        # Exits the block with commit or rollback.
+```
+
+```text
++------------+--------------+-----------+-----------------------------------+
+| Dialects   | pip3 install | import    | Dependencies                      |
++------------+--------------+-----------+-----------------------------------+
+| mysql      | mysqlclient  | MySQLdb   | www.pypi.org/project/mysqlclient  |
+| postgresql | psycopg2     | psycopg2  | www.psycopg.org/docs/install.html |
+| mssql      | pyodbc       | pyodbc    | apt install g++ unixodbc-dev      |
+| oracle     | cx_oracle    | cx_Oracle | Oracle Instant Client             |
++------------+--------------+-----------+-----------------------------------+
 ```
 
 
@@ -1937,26 +1941,26 @@ Bytes
 **Bytes object is an immutable sequence of single bytes. Mutable version is called bytearray.**
 
 ```python
-<bytes> = b'<str>'                       # Only accepts ASCII characters and \x00-\xff.
-<int>   = <bytes>[<index>]               # Returns an int in range from 0 to 255.
-<bytes> = <bytes>[<slice>]               # Returns bytes even if it has only one element.
-<bytes> = <bytes>.join(<coll_of_bytes>)  # Joins elements using bytes as a separator.
+<bytes> = b'<str>'                          # Only accepts ASCII characters and \x00-\xff.
+<int>   = <bytes>[<index>]                  # Returns an int in range from 0 to 255.
+<bytes> = <bytes>[<slice>]                  # Returns bytes even if it has only one element.
+<bytes> = <bytes>.join(<coll_of_bytes>)     # Joins elements using bytes as a separator.
 ```
 
 ### Encode
 ```python
-<bytes> = bytes(<coll_of_ints>)          # Ints must be in range from 0 to 255.
-<bytes> = bytes(<str>, 'utf-8')          # Or: <str>.encode('utf-8')
-<bytes> = <int>.to_bytes(n_bytes, …)     # `byteorder='big/little', signed=False`.
-<bytes> = bytes.fromhex('<hex>')         # Hex pairs can be separated by whitespaces.
+<bytes> = bytes(<coll_of_ints>)             # Ints must be in range from 0 to 255.
+<bytes> = bytes(<str>, 'utf-8')             # Or: <str>.encode('utf-8')
+<bytes> = <int>.to_bytes(n_bytes, …)        # `byteorder='little/big', signed=False`.
+<bytes> = bytes.fromhex('<hex>')            # Hex pairs can be separated by whitespaces.
 ```
 
 ### Decode
 ```python
-<list>  = list(<bytes>)                  # Returns ints in range from 0 to 255.
-<str>   = str(<bytes>, 'utf-8')          # Or: <bytes>.decode('utf-8')
-<int>   = int.from_bytes(<bytes>, …)     # `byteorder='big/little', signed=False`.
-'<hex>' = <bytes>.hex()                  # Returns hex pairs. Accepts `sep=<str>`.
+<list>  = list(<bytes>)                     # Returns ints in range from 0 to 255.
+<str>   = str(<bytes>, 'utf-8')             # Or: <bytes>.decode('utf-8')
+<int>   = int.from_bytes(<bytes>, …)        # `byteorder='little/big', signed=False`.
+'<hex>' = <bytes>.hex()                     # Returns hex pairs. Accepts `sep=<str>`.
 ```
 
 ### Read Bytes from File
@@ -1998,8 +2002,8 @@ b'\x00\x01\x00\x02\x00\x00\x00\x03'
 * **`'<'` - Little-endian.**
 * **`'>'` - Big-endian (also `'!'`).**
 
-#### Besides numbers, pack() and unpack() also support bytes objects as part of the seqence:
-* **`'c'` - A bytes object with a single element. Use `'x'` for pad byte.**
+#### Besides numbers, pack() and unpack() also support bytes objects as part of the sequence:
+* **`'c'` - A bytes object with a single element. For pad byte use `'x'`.**
 * **`'<n>s'` - A bytes object with n elements.**
 
 #### Integer types. Use a capital letter for unsigned type. Minimum and standard sizes are in brackets:
@@ -2046,7 +2050,7 @@ Memory View
 
 ### Decode
 ```python
-<bytes> = bytes(<mview>)                       # Creates a new bytes object.
+<bytes> = bytes(<mview>)                       # Returns a new bytes object.
 <bytes> = <bytes>.join(<coll_of_mviews>)       # Joins mviews using bytes object as sep.
 <array> = array('<typecode>', <mview>)         # Treats mview as a sequence of numbers.
 <file>.write(<mview>)                          # Writes mview to the binary file.
@@ -2055,7 +2059,7 @@ Memory View
 ```python
 <list>  = list(<mview>)                        # Returns a list of ints or floats.
 <str>   = str(<mview>, 'utf-8')                # Treats mview as a bytes object.
-<int>   = int.from_bytes(<mview>, …)           # `byteorder='big/little', signed=False`.
+<int>   = int.from_bytes(<mview>, …)           # `byteorder='little/big', signed=False`.
 '<hex>' = <mview>.hex()                        # Treats mview as a bytes object.
 ```
 
@@ -2098,7 +2102,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 ### Lock
 ```python
-<lock> = RLock()                               # Lock that can only be released by the owner.
+<lock> = RLock()                               # Lock that can only be released by acquirer.
 <lock>.acquire()                               # Waits for the lock to be available.
 <lock>.release()                               # Makes the lock available again.
 ```
@@ -2193,11 +2197,11 @@ delattr(<object>, '<attr_name>')           # Same. Also `del <object>.<attr_name
 
 ### Parameters
 ```python
-from inspect import signature
-<Sig>  = signature(<function>)             # Function's Signature object.
-<dict> = <Sig>.parameters                  # Dict of function's Parameter objects.
-<str>  = <Param>.name                      # Parameter's name.
+<Sig>  = inspect.signature(<function>)     # Function's Signature object.
+<dict> = <Sig>.parameters                  # Dict of Parameter objects.
 <memb> = <Param>.kind                      # Member of ParameterKind enum.
+<obj>  = <Param>.default                   # Default value or <Param>.empty.
+<type> = <Param>.annotation                # Type or <Param>.empty.
 ```
 
 
@@ -2253,7 +2257,7 @@ class MyClass(metaclass=MyMetaClass):
 
 ### Type Diagram
 ```python
-type(MyClass)     == MyMetaClass     # MyClass is an instance of MyMetaClass.
+type(MyClass) == MyMetaClass         # MyClass is an instance of MyMetaClass.
 type(MyMetaClass) == type            # MyMetaClass is an instance of type.
 ```
 
@@ -2271,7 +2275,7 @@ type(MyMetaClass) == type            # MyMetaClass is an instance of type.
 
 ### Inheritance Diagram
 ```python
-MyClass.__base__     == object       # MyClass is a subclass of object.
+MyClass.__base__ == object           # MyClass is a subclass of object.
 MyMetaClass.__base__ == type         # MyMetaClass is a subclass of type.
 ```
 
@@ -2304,7 +2308,7 @@ Coroutines
 * **Coroutines have a lot in common with threads, but unlike threads, they only give up control when they call another coroutine and they don’t use as much memory.**
 * **Coroutine definition starts with `'async'` and its call with `'await'`.**
 * **`'asyncio.run(<coroutine>)'` is the main entry point for asynchronous programs.**
-* **Functions wait(), gather() and as_completed() can be used when multiple coroutines need to be started at the same time.**
+* **Functions wait(), gather() and as_completed() start multiple coroutines at the same time.**
 * **Asyncio module also provides its own [Queue](#queue), [Event](#semaphore-event-barrier), [Lock](#lock) and [Semaphore](#semaphore-event-barrier) classes.**
 
 #### Runs a terminal game where you control an asterisk that must avoid numbers:
@@ -2322,11 +2326,12 @@ def main(screen):
     asyncio.run(main_coroutine(screen))        # Starts running asyncio code.
 
 async def main_coroutine(screen):
-    state = {'*': P(0, 0), **{id_: P(W//2, H//2) for id_ in range(10)}}
     moves = asyncio.Queue()
-    coros = (*(random_controller(id_, moves) for id_ in range(10)),
-             human_controller(screen, moves), model(moves, state), view(state, screen))
-    await asyncio.wait(coros, return_when=asyncio.FIRST_COMPLETED)
+    state = {'*': P(0, 0), **{id_: P(W//2, H//2) for id_ in range(10)}}
+    ai    = [random_controller(id_, moves) for id_ in range(10)]
+    mvc   = [human_controller(screen, moves), model(moves, state), view(state, screen)]
+    tasks = [asyncio.create_task(cor) for cor in ai + mvc]
+    await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
 
 async def random_controller(id_, moves):
     while True:
@@ -2411,12 +2416,12 @@ Curses
 ------
 #### Runs a basic file explorer in the terminal:
 ```python
-from curses import wrapper, ascii, A_REVERSE, KEY_DOWN, KEY_UP, KEY_LEFT, KEY_RIGHT, KEY_ENTER
-from os import listdir, path, chdir
+import curses, curses.ascii, os
+from curses import A_REVERSE, KEY_DOWN, KEY_UP, KEY_LEFT, KEY_RIGHT, KEY_ENTER
 
 def main(screen):
-    ch, first, selected, paths = 0, 0, 0, listdir()
-    while ch != ascii.ESC:
+    ch, first, selected, paths = 0, 0, 0, os.listdir()
+    while ch != curses.ascii.ESC:
         height, _ = screen.getmaxyx()
         screen.erase()
         for y, filename in enumerate(paths[first : first+height]):
@@ -2427,12 +2432,12 @@ def main(screen):
         first += (first <= selected - height) - (first > selected)
         if ch in [KEY_LEFT, KEY_RIGHT, KEY_ENTER, 10, 13]:
             new_dir = '..' if ch == KEY_LEFT else paths[selected]
-            if path.isdir(new_dir):
-                chdir(new_dir)
-                first, selected, paths = 0, 0, listdir()
+            if os.path.isdir(new_dir):
+                os.chdir(new_dir)
+                first, selected, paths = 0, 0, os.listdir()
 
 if __name__ == '__main__':
-    wrapper(main)
+    curses.wrapper(main)
 ```
 
 
@@ -2446,7 +2451,7 @@ from loguru import logger
 ```python
 logger.add('debug_{time}.log', colorize=True)  # Connects a log file.
 logger.add('error_{time}.log', level='ERROR')  # Another file for errors or higher.
-logger.<level>('A logging message.')
+logger.<level>('A logging message.')           # Logs to file/s and prints to stderr.
 ```
 * **Levels: `'debug'`, `'info'`, `'success'`, `'warning'`, `'error'`, `'critical'`.**
 
@@ -2560,18 +2565,10 @@ Profiling
 ---------
 ### Stopwatch
 ```python
-from time import time
-start_time = time()                     # Seconds since the Epoch.
-...
-duration = time() - start_time
-```
-
-#### High performance:
-```python
 from time import perf_counter
-start_time = perf_counter()             # Seconds since the restart.
+start_time = perf_counter()
 ...
-duration = perf_counter() - start_time
+duration_in_seconds = perf_counter() - start_time
 ```
 
 ### Timing a Snippet
@@ -2615,10 +2612,10 @@ Line #         Mem usage      Increment   Line Contents
 ### Call Graph
 #### Generates a PNG image of the call graph with highlighted bottlenecks:
 ```python
-# $ pip3 install pycallgraph2
-# $ apt install graphviz
+# $ pip3 install pycallgraph2; apt/brew install graphviz
 import pycallgraph2 as cg, datetime
-filename = f'profile-{datetime.datetime.now():%Y%m%d%H%M%S}.png'
+
+filename = f'profile-{datetime.datetime.now():%Y%m%d_%H%M%S}.png'
 drawer = cg.output.GraphvizOutput(output_file=filename)
 with cg.PyCallGraph(drawer):
     <code_to_be_profiled>
@@ -2635,62 +2632,70 @@ import numpy as np
 ```
 
 ```python
-<array> = np.array(<list/list_of_lists>)
-<array> = np.arange(from_inclusive, to_exclusive, ±step_size)
-<array> = np.ones(<shape>)
-<array> = np.random.randint(from_inclusive, to_exclusive, <shape>)
+<array> = np.array(<list/list_of_lists>)                # Returns 1d/2d NumPy array.
+<array> = np.zeros/ones(<shape>)                        # Also np.full(<shape>, <el>).
+<array> = np.arange(from_inc, to_exc, ±step)            # Also np.linspace(start, stop, num).
+<array> = np.random.randint(from_inc, to_exc, <shape>)  # Also np.random.random(<shape>).
 ```
 
 ```python
-<array>.shape = <shape>
-<view>  = <array>.reshape(<shape>)
-<view>  = np.broadcast_to(<array>, <shape>)
+<view>  = <array>.reshape(<shape>)                      # Also `<array>.shape = <shape>`.
+<array> = <array>.flatten()                             # Collapses array into one dimension.
+<view>  = <array>.squeeze()                             # Removes dimensions of length one.
 ```
 
 ```python
-<array> = <array>.sum(axis)
-indexes = <array>.argmin(axis)
+<array> = <array>.sum/min/mean/var/std(axis)            # Passed dimension gets aggregated.
+<array> = <array>.argmin(axis)                          # Returns indexes of smallest elements.
+<array> = np.apply_along_axis(<func>, axis, <array>)    # Func can return a scalar or array.
 ```
 
-* **Shape is a tuple of dimension sizes.**
-* **Axis is an index of the dimension that gets aggregated. Leftmost dimension has index 0.**
+* **Shape is a tuple of dimension sizes. A 100x50 RGB image has shape (50, 100, 3).**
+* **Axis is an index of the dimension that gets aggregated. Leftmost dimension has index 0. Summing the RGB image along axis 2 will return a greyscale image with shape (50, 100).**
+* **Passing a tuple of axes will chain the operations like this: `'<array>.<method>(axis_1, keepdims=True).<method>(axis_2).squeeze()'`.**
 
 ### Indexing
 ```bash
-<el>       = <2d_array>[row_index, column_index]
-<1d_view>  = <2d_array>[row_index]
-<1d_view>  = <2d_array>[:, column_index]
+<el>       = <2d_array>[row_index, column_index]        # <3d_a>[table_i, row_i, column_i]
+<1d_view>  = <2d_array>[row_index]                      # <3d_a>[table_i, row_i]
+<1d_view>  = <2d_array>[:, column_index]                # <3d_a>[table_i, :, column_i]
 ```
 
 ```bash
-<1d_array> = <2d_array>[row_indexes, column_indexes]
-<2d_array> = <2d_array>[row_indexes]
-<2d_array> = <2d_array>[:, column_indexes]
+<1d_array> = <2d_array>[row_indexes, column_indexes]    # <3d_a>[table_is, row_is, column_is]
+<2d_array> = <2d_array>[row_indexes]                    # <3d_a>[table_is, row_is]
+<2d_array> = <2d_array>[:, column_indexes]              # <3d_a>[table_is, :, column_is]
 ```
 
 ```bash
-<2d_bools> = <2d_array> ><== <el>
-<1d_array> = <2d_array>[<2d_bools>]
+<2d_bools> = <2d_array> ><== <el>                       # <3d_array> ><== <1d_array>
+<1d_array> = <2d_array>[<2d_bools>]                     # <3d_array>[<2d_bools>]
 ```
+* **All examples also allow assignments.**
 
 ### Broadcasting
 **Broadcasting is a set of rules by which NumPy functions operate on arrays of different sizes and/or dimensions.**
 
 ```python
-left  = [[0.1], [0.6], [0.8]]        # Shape: (3, 1)
-right = [ 0.1 ,  0.6 ,  0.8 ]        # Shape: (3)
+left  = [[0.1], [0.6], [0.8]]                           # Shape: (3, 1)
+right = [ 0.1 ,  0.6 ,  0.8 ]                           # Shape: (3,)
 ```
 
 #### 1. If array shapes differ in length, left-pad the shorter shape with ones:
 ```python
-left  = [[0.1], [0.6], [0.8]]        # Shape: (3, 1)
-right = [[0.1 ,  0.6 ,  0.8]]        # Shape: (1, 3) <- !
+left  = [[0.1], [0.6], [0.8]]                           # Shape: (3, 1)
+right = [[0.1 ,  0.6 ,  0.8]]                           # Shape: (1, 3) <- !
 ```
 
 #### 2. If any dimensions differ in size, expand the ones that have size 1 by duplicating their elements:
 ```python
-left  = [[0.1, 0.1, 0.1], [0.6, 0.6, 0.6], [0.8, 0.8, 0.8]]  # Shape: (3, 3) <- !
-right = [[0.1, 0.6, 0.8], [0.1, 0.6, 0.8], [0.1, 0.6, 0.8]]  # Shape: (3, 3) <- !
+left  = [[0.1,  0.1,  0.1],                             # Shape: (3, 3) <- !
+         [0.6,  0.6,  0.6],
+         [0.8,  0.8,  0.8]]
+
+right = [[0.1,  0.6,  0.8],                             # Shape: (3, 3) <- !
+         [0.1,  0.6,  0.8],
+         [0.1,  0.6,  0.8]]
 ```
 
 #### 3. If neither non-matching dimension has size 1, raise an error.
@@ -2733,25 +2738,25 @@ from PIL import Image
 ```
 
 ```python
-<Image> = Image.new('<mode>', (width, height))  # Also: `color=<int/tuple/str>`.
-<Image> = Image.open(<path>)                    # Identifies format based on file contents.
-<Image> = <Image>.convert('<mode>')             # Converts image to the new mode.
-<Image>.save(<path>)                            # Selects format based on the path extension.
-<Image>.show()                                  # Opens image in default preview app.
+<Image> = Image.new('<mode>', (width, height))   # Also: `color=<int/tuple/str>`.
+<Image> = Image.open(<path>)                     # Identifies format based on file contents.
+<Image> = <Image>.convert('<mode>')              # Converts image to the new mode.
+<Image>.save(<path>)                             # Selects format based on the path extension.
+<Image>.show()                                   # Opens image in default preview app.
 ```
 
 ```python
-<int/tuple> = <Image>.getpixel((x, y))          # Returns a pixel.
-<Image>.putpixel((x, y), <int/tuple>)           # Writes a pixel to the image.
-<ImagingCore> = <Image>.getdata()               # Returns a flattened sequence of pixels.
-<Image>.putdata(<list/ImagingCore>)             # Writes a flattened sequence of pixels.
-<Image>.paste(<Image>, (x, y))                  # Writes an image to the image.
+<int/tuple> = <Image>.getpixel((x, y))           # Returns a pixel.
+<Image>.putpixel((x, y), <int/tuple>)            # Writes a pixel to the image.
+<ImagingCore> = <Image>.getdata()                # Returns a flattened sequence of pixels.
+<Image>.putdata(<list/ImagingCore>)              # Writes a flattened sequence of pixels.
+<Image>.paste(<Image>, (x, y))                   # Writes passed image to the image.
 ```
 
 ```bash
-<2d_array> = np.array(<Image_L>)                # Creates NumPy array from greyscale image.
-<3d_array> = np.array(<Image_RGB>)              # Creates NumPy array from color image.
-<Image>    = Image.fromarray(<array>)           # Creates image from NumPy array of floats.
+<2d_array> = np.array(<Image_L>)                 # Creates NumPy array from greyscale image.
+<3d_array> = np.array(<Image_RGB/A>)             # Creates NumPy array from color image.
+<Image>    = Image.fromarray(np.uint8(<array>))  # Use <array>.clip(0, 255) to clip the values.
 ```
 
 ### Modes
@@ -2788,17 +2793,17 @@ from PIL import ImageDraw
 ```
 
 ```python
-<ImageDraw>.point((x, y))
-<ImageDraw>.line((x1, y1, x2, y2 [, ...]))
-<ImageDraw>.arc((x1, y1, x2, y2), from_deg, to_deg)
-<ImageDraw>.rectangle((x1, y1, x2, y2))
-<ImageDraw>.polygon((x1, y1, x2, y2 [, ...]))
-<ImageDraw>.ellipse((x1, y1, x2, y2))
+<ImageDraw>.point((x, y))                        # Truncates floats into ints.
+<ImageDraw>.line((x1, y1, x2, y2 [, ...]))       # To get anti-aliasing use Image's resize().
+<ImageDraw>.arc((x1, y1, x2, y2), deg1, deg2)    # Always draws in clockwise direction.
+<ImageDraw>.rectangle((x1, y1, x2, y2))          # To rotate use Image's rotate() and paste().
+<ImageDraw>.polygon((x1, y1, x2, y2, ...))       # Last point gets connected to the first.
+<ImageDraw>.ellipse((x1, y1, x2, y2))            # To rotate use Image's rotate() and paste().
 ```
 * **Use `'fill=<color>'` to set the primary color.**
 * **Use `'width=<int>'` to set the width of lines or contours.**
 * **Use `'outline=<color>'` to set the color of the contours.**
-* **Colors can be specified as an int, tuple, `'#rrggbb[aa]'` string or a color name.**
+* **Color can be an int, tuple, `'#rrggbb[aa]'` string or a color name.**
 
 
 Animation
@@ -2808,6 +2813,7 @@ Animation
 # $ pip3 install imageio
 from PIL import Image, ImageDraw
 import imageio
+
 WIDTH, HEIGHT, R = 126, 126, 10
 frames = []
 for velocity in range(1, 16):
@@ -2853,14 +2859,13 @@ nframes      = <Wave_read>.getnframes()         # Number of frames.
 
 ### Sample Values
 ```text
-+-----------+-------------+------+-------------+
-| sampwidth |     min     | zero |     max     |
-+-----------+-------------+------+-------------+
-|     1     |           0 |  128 |         255 |
-|     2     |      -32768 |    0 |       32767 |
-|     3     |    -8388608 |    0 |     8388607 |
-|     4     | -2147483648 |    0 |  2147483647 |
-+-----------+-------------+------+-------------+
++-----------+-----------+------+-----------+
+| sampwidth |    min    | zero |    max    |
++-----------+-----------+------+-----------+
+|     1     |         0 |  128 |       255 |
+|     2     |    -32768 |    0 |     32767 |
+|     3     |  -8388608 |    0 |   8388607 |
++-----------+-----------+------+-----------+
 ```
 
 ### Read Float Samples from WAV File
@@ -2932,18 +2937,18 @@ Synthesizer
 #### Plays Popcorn by Gershon Kingsley:
 ```python
 # $ pip3 install simpleaudio
-import math, struct, simpleaudio
-from itertools import repeat, chain
+import itertools as it, math, struct, simpleaudio
+
 F  = 44100
 P1 = '71♩,69♪,,71♩,66♪,,62♩,66♪,,59♩,,'
 P2 = '71♩,73♪,,74♩,73♪,,74♪,,71♪,,73♩,71♪,,73♪,,69♪,,71♩,69♪,,71♪,,67♪,,71♩,,'
-get_pause   = lambda seconds: repeat(0, int(seconds * F))
+get_pause   = lambda seconds: it.repeat(0, int(seconds * F))
 sin_f       = lambda i, hz: math.sin(i * 2 * math.pi * hz / F)
 get_wave    = lambda hz, seconds: (sin_f(i, hz) for i in range(int(seconds * F)))
 get_hz      = lambda key: 8.176 * 2 ** (int(key) / 12)
 parse_note  = lambda note: (get_hz(note[:2]), 1/4 if '♩' in note else 1/8)
 get_samples = lambda note: get_wave(*parse_note(note)) if note else get_pause(1/8)
-samples_f   = chain.from_iterable(get_samples(n) for n in f'{P1},{P1},{P2}'.split(','))
+samples_f   = it.chain.from_iterable(get_samples(n) for n in f'{P1},{P1},{P2}'.split(','))
 samples_b   = b''.join(struct.pack('<h', int(f * 30000)) for f in samples_f)
 simpleaudio.play_buffer(samples_b, 1, 2, F)
 ```
@@ -2951,10 +2956,10 @@ simpleaudio.play_buffer(samples_b, 1, 2, F)
 
 Pygame
 ------
-### Basic Example
 ```python
 # $ pip3 install pygame
 import pygame as pg
+
 pg.init()
 screen = pg.display.set_mode((500, 500))
 rect = pg.Rect(240, 240, 20, 20)
@@ -2986,8 +2991,8 @@ while all(event.type != pg.QUIT for event in pg.event.get()):
 ### Surface
 **Object for representing images.**
 ```python
-<Surf> = pg.display.set_mode((width, height))   # Returns display surface.
-<Surf> = pg.Surface((width, height), flags=0)   # New RGB surface. RGBA if `flags=pg.SRCALPHA`.
+<Surf> = pg.display.set_mode((width, height))   # Returns a display surface.
+<Surf> = pg.Surface((width, height))            # New RGB surface. RGBA if `flags=pg.SRCALPHA`.
 <Surf> = pg.image.load('<path>')                # Loads the image. Format depends on source.
 <Surf> = <Surf>.subsurface(<Rect>)              # Returns a subsurface.
 ```
@@ -3001,15 +3006,15 @@ while all(event.type != pg.QUIT for event in pg.event.get()):
 ```python
 from pygame.transform import scale, ...
 <Surf> = scale(<Surf>, (width, height))         # Returns scaled surface.
-<Surf> = rotate(<Surf>, degrees)                # Returns rotated and scaled surface.
+<Surf> = rotate(<Surf>, anticlock_degrees)      # Returns rotated and scaled surface.
 <Surf> = flip(<Surf>, x_bool, y_bool)           # Returns flipped surface.
 ```
 
 ```python
 from pygame.draw import line, ...
 line(<Surf>, color, (x1, y1), (x2, y2), width)  # Draws a line to the surface.
-arc(<Surf>, color, <Rect>, from_rad, to_rad)    # Also: ellipse(<Surf>, color, <Rect>)
-rect(<Surf>, color, <Rect>)                     # Also: polygon(<Surf>, color, points)
+arc(<Surf>, color, <Rect>, from_rad, to_rad)    # Also: ellipse(<Surf>, color, <Rect>, width=0)
+rect(<Surf>, color, <Rect>, width=0)            # Also: polygon(<Surf>, color, points, width=0)
 ```
 
 ### Font
@@ -3106,9 +3111,10 @@ if __name__ == '__main__':
 Pandas
 ------
 ```python
-# $ pip3 install pandas
+# $ pip3 install pandas matplotlib
 import pandas as pd
 from pandas import Series, DataFrame
+import matplotlib.pyplot as plt
 ```
 
 ### Series
@@ -3122,44 +3128,44 @@ Name: a, dtype: int64
 ```
 
 ```python
-<Sr> = Series(<list>)                         # Assigns RangeIndex starting at 0.
-<Sr> = Series(<dict>)                         # Takes dictionary's keys for index.
-<Sr> = Series(<dict/Series>, index=<list>)    # Only keeps items with keys specified in index.
+<Sr> = Series(<list>)                          # Assigns RangeIndex starting at 0.
+<Sr> = Series(<dict>)                          # Takes dictionary's keys for index.
+<Sr> = Series(<dict/Series>, index=<list>)     # Only keeps items with keys specified in index.
 ```
 
 ```python
-<el> = <Sr>.loc[key]                          # Or: <Sr>.iloc[index]
-<Sr> = <Sr>.loc[keys]                         # Or: <Sr>.iloc[indexes]
-<Sr> = <Sr>.loc[from_key : to_key_inclusive]  # Or: <Sr>.iloc[from_i : to_i_exclusive]
+<el> = <Sr>.loc[key]                           # Or: <Sr>.iloc[index]
+<Sr> = <Sr>.loc[keys]                          # Or: <Sr>.iloc[indexes]
+<Sr> = <Sr>.loc[from_key : to_key_inclusive]   # Or: <Sr>.iloc[from_i : to_i_exclusive]
 ```
 
 ```python
-<el> = <Sr>[key/index]                        # Or: <Sr>.key
-<Sr> = <Sr>[keys/indexes]                     # Or: <Sr>[<key_range/range>]
-<Sr> = <Sr>[bools]                            # Or: <Sr>.i/loc[bools]
+<el> = <Sr>[key/index]                         # Or: <Sr>.key
+<Sr> = <Sr>[keys/indexes]                      # Or: <Sr>[<key_range/range>]
+<Sr> = <Sr>[bools]                             # Or: <Sr>.i/loc[bools]
 ```
 
 ```python
-<Sr> = <Sr> ><== <el/Sr>                      # Returns a Series of bools.
-<Sr> = <Sr> +-*/ <el/Sr>                      # Items with non-matching keys get value NaN.
+<Sr> = <Sr> ><== <el/Sr>                       # Returns a Series of bools.
+<Sr> = <Sr> +-*/ <el/Sr>                       # Items with non-matching keys get value NaN.
 ```
 
 ```python
-<Sr> = <Sr>.append(<Sr>)                      # Or: pd.concat(<coll_of_Sr>)
-<Sr> = <Sr>.combine_first(<Sr>)               # Adds items that are not yet present.
-<Sr>.update(<Sr>)                             # Updates items that are already present.
+<Sr> = <Sr>.append(<Sr>)                       # Or: pd.concat(<coll_of_Sr>)
+<Sr> = <Sr>.combine_first(<Sr>)                # Adds items that are not yet present.
+<Sr>.update(<Sr>)                              # Updates items that are already present.
 ```
 
 ```python
-<Sr>.plot.line/area/bar/pie/hist()            # Generates a Matplotlib plot.
-matplotlib.pyplot.show()                      # Displays the plot. Also savefig(<path>).
+<Sr>.plot.line/area/bar/pie/hist()             # Generates a Matplotlib plot.
+plt.show()                                     # Displays the plot. Also plt.savefig(<path>).
 ```
 
 #### Series — Aggregate, Transform, Map:
 ```python
-<el> = <Sr>.sum/max/mean/idxmax/all()         # Or: <Sr>.agg(lambda <Sr>: <el>)
-<Sr> = <Sr>.rank/diff/cumsum/ffill/interpl()  # Or: <Sr>.agg/transform(lambda <Sr>: <Sr>)
-<Sr> = <Sr>.fillna(<el>)                      # Or: <Sr>.agg/transform/map(lambda <el>: <el>)
+<el> = <Sr>.sum/max/mean/idxmax/all()          # Or: <Sr>.agg(lambda <Sr>: <el>)
+<Sr> = <Sr>.rank/diff/cumsum/ffill/interpl()   # Or: <Sr>.agg/transform(lambda <Sr>: <Sr>)
+<Sr> = <Sr>.fillna(<el>)                       # Or: <Sr>.agg/transform/map(lambda <el>: <el>)
 ```
 
 ```python
@@ -3199,33 +3205,33 @@ b  3  4
 ```
 
 ```python
-<DF>    = DataFrame(<list_of_rows>)           # Rows can be either lists, dicts or series.
-<DF>    = DataFrame(<dict_of_columns>)        # Columns can be either lists, dicts or series.
+<DF>    = DataFrame(<list_of_rows>)            # Rows can be either lists, dicts or series.
+<DF>    = DataFrame(<dict_of_columns>)         # Columns can be either lists, dicts or series.
 ```
 
 ```python
-<el>    = <DF>.loc[row_key, column_key]       # Or: <DF>.iloc[row_index, column_index]
-<Sr/DF> = <DF>.loc[row_key/s]                 # Or: <DF>.iloc[row_index/es]
-<Sr/DF> = <DF>.loc[:, column_key/s]           # Or: <DF>.iloc[:, column_index/es]
-<DF>    = <DF>.loc[row_bools, column_bools]   # Or: <DF>.iloc[row_bools, column_bools]
+<el>    = <DF>.loc[row_key, column_key]        # Or: <DF>.iloc[row_index, column_index]
+<Sr/DF> = <DF>.loc[row_key/s]                  # Or: <DF>.iloc[row_index/es]
+<Sr/DF> = <DF>.loc[:, column_key/s]            # Or: <DF>.iloc[:, column_index/es]
+<DF>    = <DF>.loc[row_bools, column_bools]    # Or: <DF>.iloc[row_bools, column_bools]
 ```
 
 ```python
-<Sr/DF> = <DF>[column_key/s]                  # Or: <DF>.column_key
-<DF>    = <DF>[row_bools]                     # Keeps rows as specified by bools.
-<DF>    = <DF>[<DF_of_bools>]                 # Assigns NaN to False values.
+<Sr/DF> = <DF>[column_key/s]                   # Or: <DF>.column_key
+<DF>    = <DF>[row_bools]                      # Keeps rows as specified by bools.
+<DF>    = <DF>[<DF_of_bools>]                  # Assigns NaN to False values.
 ```
 
 ```python
-<DF>    = <DF> ><== <el/Sr/DF>                # Returns DF of bools. Sr is treated as a row.
-<DF>    = <DF> +-*/ <el/Sr/DF>                # Items with non-matching keys get value NaN.
+<DF>    = <DF> ><== <el/Sr/DF>                 # Returns DF of bools. Sr is treated as a row.
+<DF>    = <DF> +-*/ <el/Sr/DF>                 # Items with non-matching keys get value NaN.
 ```
 
 ```python
-<DF>    = <DF>.set_index(column_key)          # Replaces row keys with values from a column.
-<DF>    = <DF>.reset_index()                  # Moves row keys to a column named index.
-<DF>    = <DF>.sort_index(ascending=True)     # Sorts rows by row keys.
-<DF>    = <DF>.sort_values(column_key/s)      # Sorts rows by the passed column/s.
+<DF>    = <DF>.set_index(column_key)           # Replaces row keys with values from a column.
+<DF>    = <DF>.reset_index()                   # Moves row keys to a column named index.
+<DF>    = <DF>.sort_index(ascending=True)      # Sorts rows by row keys.
+<DF>    = <DF>.sort_values(column_key/s)       # Sorts rows by the passed column/s.
 ```
 
 #### DataFrame — Merge, Join, Concat:
@@ -3251,18 +3257,18 @@ c  6  7
 +------------------------+---------------+------------+------------+--------------------------+
 | l.join(r, lsuffix='l', |    x yl yr  z |            | x yl yr  z | Joins/merges on row keys.|
 |           rsuffix='r', | a  1  2  .  . | x yl yr  z | 1  2  .  . | Uses 'left' by default.  |
-|           how=…)       | b  3  4  4  5 | 3  4  4  5 | 3  4  4  5 | If r is a series, it is  |
+|           how=…)       | b  3  4  4  5 | 3  4  4  5 | 3  4  4  5 | If r is a Series, it is  |
 |                        | c  .  .  6  7 |            |            | treated as a column.     |
 +------------------------+---------------+------------+------------+--------------------------+
 | pd.concat([l, r],      |    x   y   z  |     y      |            | Adds rows at the bottom. |
 |           axis=0,      | a  1   2   .  |     2      |            | Uses 'outer' by default. |
-|           join=…)      | b  3   4   .  |     4      |            | A series is treated as a |
+|           join=…)      | b  3   4   .  |     4      |            | A Series is treated as a |
 |                        | b  .   4   5  |     4      |            | column. Use l.append(sr) |
 |                        | c  .   6   7  |     6      |            | to add a row instead.    |
 +------------------------+---------------+------------+------------+--------------------------+
 | pd.concat([l, r],      |    x  y  y  z |            |            | Adds columns at the      |
 |           axis=1,      | a  1  2  .  . | x  y  y  z |            | right end. Uses 'outer'  |
-|           join=…)      | b  3  4  4  5 | 3  4  4  5 |            | by default. A series is  |
+|           join=…)      | b  3  4  4  5 | 3  4  4  5 |            | by default. A Series is  |
 |                        | c  .  .  6  7 |            |            | treated as a column.     |
 +------------------------+---------------+------------+------------+--------------------------+
 | l.combine_first(r)     |    x   y   z  |            |            | Adds missing rows and    |
@@ -3274,9 +3280,9 @@ c  6  7
 
 #### DataFrame — Aggregate, Transform, Map:
 ```python
-<Sr> = <DF>.sum/max/mean/idxmax/all()         # Or: <DF>.apply/agg(lambda <Sr>: <el>)
-<DF> = <DF>.rank/diff/cumsum/ffill/interpl()  # Or: <DF>.apply/agg/transform(lambda <Sr>: <Sr>)
-<DF> = <DF>.fillna(<el>)                      # Or: <DF>.applymap(lambda <el>: <el>)
+<Sr> = <DF>.sum/max/mean/idxmax/all()          # Or: <DF>.apply/agg(lambda <Sr>: <el>)
+<DF> = <DF>.rank/diff/cumsum/ffill/interpl()   # Or: <DF>.apply/agg/transfrm(lambda <Sr>: <Sr>)
+<DF> = <DF>.fillna(<el>)                       # Or: <DF>.applymap(lambda <el>: <el>)
 ```
 * **All operations operate on columns by default. Pass `'axis=1'` to process the rows instead.**
 
@@ -3311,22 +3317,22 @@ b  3  4
 
 #### DataFrame — Plot, Encode, Decode:
 ```python
-import matplotlib.pyplot as plt
-<DF>.plot.line/bar/hist/scatter([x=column_key, y=column_key/s]); plt.show()
+<DF>.plot.line/bar/hist/scatter/box()          # Also: `x=column_key, y=column_key/s`.
+plt.show()                                     # Displays the plot. Also plt.savefig(<path>).
 ```
 
 ```python
-<DF> = pd.read_json/html('<str/path/url>')
-<DF> = pd.read_csv/pickle/excel('<path/url>')
-<DF> = pd.read_sql('<table_name/query>', <connection>)
-<DF> = pd.read_clipboard()
+<DF> = pd.read_json/html('<str/path/url>')     # Run `$ pip3 install beautifulsoup4 lxml`.
+<DF> = pd.read_csv/pickle/excel('<path/url>')  # Use `sheet_name=None` to get all Excel sheets.
+<DF> = pd.read_sql('<table/query>', <conn.>)   # Accepts SQLite3 or SQLAlchemy connection.
+<DF> = pd.read_clipboard()                     # Reads a copied table from the clipboard.
 ```
 
 ```python
-<dict> = <DF>.to_dict(['d/l/s/sp/r/i'])
-<str>  = <DF>.to_json/html/csv/markdown/latex([<path>])
-<DF>.to_pickle/excel(<path>)
-<DF>.to_sql('<table_name>', <connection>)
+<dict> = <DF>.to_dict(['d/l/s/…'])             # Returns columns as dicts, lists or series.
+<str>  = <DF>.to_json/html/csv([<path>])       # Also to_markdown/latex([<path>]).
+<DF>.to_pickle/excel(<path>)                   # Run `$ pip3 install openpyxl` for xlsx files.
+<DF>.to_sql('<table_name>', <connection>)      # Accepts SQLite3 or SQLAlchemy connection.
 ```
 
 ### GroupBy
@@ -3341,16 +3347,16 @@ c  7  8
 ```
 
 ```python
-<GB> = <DF>.groupby(column_key/s)             # DF is split into groups based on passed column.
-<DF> = <GB>.apply(<func>)                     # Maps each group. Func can return DF, Sr or el.
-<GB> = <GB>[column_key]                       # A single column GB. All operations return a Sr.
+<GB> = <DF>.groupby(column_key/s)              # Splits DF into groups based on passed column.
+<DF> = <GB>.apply(<func>)                      # Maps each group. Func can return DF, Sr or el.
+<GB> = <GB>[column_key]                        # Single column GB. All operations return a Sr.
 ```
 
 #### GroupBy — Aggregate, Transform, Map:
 ```python
-<DF> = <GB>.sum/max/mean/idxmax/all()         # Or: <GB>.agg(lambda <Sr>: <el>)
-<DF> = <GB>.rank/diff/cumsum/ffill()          # Or: <GB>.transform(lambda <Sr>: <Sr>)
-<DF> = <GB>.fillna(<el>)                      # Or: <GB>.transform(lambda <Sr>: <Sr>)
+<DF> = <GB>.sum/max/mean/idxmax/all()          # Or: <GB>.agg(lambda <Sr>: <el>)
+<DF> = <GB>.rank/diff/cumsum/ffill()           # Or: <GB>.transform(lambda <Sr>: <Sr>)
+<DF> = <GB>.fillna(<el>)                       # Or: <GB>.transform(lambda <Sr>: <Sr>)
 ```
 
 ```python
@@ -3382,9 +3388,9 @@ c  7  8
 **Object for rolling window calculations.**
 
 ```python
-<R_Sr/R_DF/R_GB> = <Sr/DF/GB>.rolling(window_size)  # Also: `min_periods=None, center=False`.
-<R_Sr/R_DF>      = <R_DF/R_GB>[column_key/s]        # Or: <R>.column_key
-<Sr/DF/DF>       = <R_Sr/R_DF/R_GB>.sum/max/mean()  # Or: <R>.apply/agg(<agg_func/str>)
+<RSr/RDF/RGB> = <Sr/DF/GB>.rolling(win_size)   # Also: `min_periods=None, center=False`.
+<RSr/RDF/RGB> = <RDF/RGB>[column_key/s]        # Or: <RDF/RGB>.column_key
+<Sr/DF>       = <R>.mean/sum/max()             # Or: <R>.apply/agg(<agg_func/str>)
 ```
 
 
@@ -3499,7 +3505,7 @@ import <cython_script>
 ```python
 cdef <ctype> <var_name> = <el>
 cdef <ctype>[n_elements] <var_name> = [<el_1>, <el_2>, ...]
-cdef <ctype/void> <func_name>(<ctype> <arg_name_1>, ...): …
+cdef <ctype/void> <func_name>(<ctype> <arg_name>): ...
 ```
 
 ```python
